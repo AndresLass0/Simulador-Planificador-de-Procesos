@@ -1,0 +1,59 @@
+body {
+  background-color: #8bcfec;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  
+  /* Estas tres líneas centran todo el contenido del body */
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  align-items: center;     /* centra verticalmente */
+  height: 100vh;           /* ocupa toda la altura de la pantalla */
+  margin: 0;               /* elimina márgenes por defecto */
+}
+
+#central {
+  background-color: rgb(211, 210, 239);
+  border-radius: 10px;  
+  border: 2px solid black;  
+  width: 400px;      /* tamaño fijo o ajustable */
+  height: 540px;
+  padding: 20px;    
+  
+  /* Centrar el contenido interno */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* si quieres que los hijos esten en columna */
+}
+
+
+#panel-botones{
+    height: 400px;
+    width: 300px;
+    border-radius: 5px;
+    
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* si quieres que los hijos esten en columna */
+
+    gap: 40px;
+}
+
+.botones{
+    background-color: #6bb5d5;
+    border-radius: 10px;
+    width: 250px;
+    height: 40px;
+    font-family: "Comic Sans MS", "Comic Sans";
+    font-size: 17px;
+    border-style: solid;
+
+}
+
+.botones:hover {
+  background-color: #f4e61a;
+  color: #ffffff;
+  transform: scale(1.3);
+}
