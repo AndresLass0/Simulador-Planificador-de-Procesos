@@ -15,17 +15,23 @@ body {
   background-color: rgb(211, 210, 239);
   border-radius: 10px;  
   border: 2px solid black;  
-  width: 400px;      /* tamaño fijo o ajustable */
-  height: 540px;
-  padding: 20px;    
-  
+  width: 55vh;      /* tamaño fijo o ajustable */
+  height: 80vh;
+
   /* Centrar el contenido interno */
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-direction: column; /* si quieres que los hijos esten en columna */
 }
 
+#titulo {
+  width:100%;
+  height: 20%;
+  border-bottom: 2px solid black;
+  text-align: center;
+  background-color:rgb(172, 170, 224);
+}
 
 #panel-botones{
     height: 400px;
