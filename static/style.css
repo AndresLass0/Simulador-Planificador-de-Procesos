@@ -77,6 +77,121 @@ body {
   flex-direction: column; /* si quieres que los hijos esten en columna */
 }
 
+/*========= BOTONES PROCESOS =========*/
+
+#container-botones-procesos{
+  width: 100%;
+  height: 200px;
+  margin-left: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: column; /* si quieres que los hijos esten en columna */
+}
+
+
+
+
+/*=========== BOTON ACEPTAR ============*/
+#marco-boton-aceptar{
+  width: 100%;
+  height: 70px;
+  align-content: center;
+}
+
+#marco-boton-aceptar button{
+  width: 150px;
+  height: 50px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: rgb(64, 241, 132);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#marco-boton-aceptar button:hover{
+  background-color: rgb(23, 199, 90);;
+}
+
+
+/*=========== BOTON AGREGAR ============*/
+#agregar input {
+  width: 120px;
+  margin: 4px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+
+#agregar button {
+  background-color: #77c8ff;
+  color: black;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#agregar button:hover {
+  background-color: #5bb7ee;
+}
+
+/* ==== SECCIÓN ELIMINAR ==== */
+#eliminar {
+  width: 95%;
+  text-align: left;
+}
+
+#eliminar input {
+  margin: 4px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  width: 160px;
+}
+
+#eliminar button {
+  background-color: #f47474;
+  border: 1px solid black;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+#eliminar button:hover {
+  background-color: #e74c4c;
+}
+
+/* ==== SECCIÓN MODIFICAR ==== */
+#modificar {
+  width: 95%;
+  text-align: left;
+}
+
+#modificar input {
+  margin: 4px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  width: 120px;
+}
+
+#modificar button {
+  background-color: #ffc800;
+  border: 1px solid black;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+
+/*=========== TABLA ALGORITMOS =========*/
 #titulo {
   width:100%;
   height:20%;
