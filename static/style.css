@@ -27,8 +27,10 @@ body {
 
 #titulo {
   width:100%;
-  height: 20%;
+  height:20%;
   border-bottom: 2px solid black;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px ;
   text-align: center;
   background-color:rgb(172, 170, 224);
 }
@@ -46,6 +48,8 @@ body {
 
     gap: 40px;
 }
+
+  
 
 .botones{
     background-color: #6bb5d5;
