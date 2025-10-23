@@ -3,6 +3,7 @@
 <head>
     <title>Simulador de Planificación</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
 </head>
 <body>
     <div id = "panel-procesos">
@@ -12,107 +13,42 @@
                 <tr>
                     <th>ID</th>
                     <th>Tiempo de llegada</th>
-                    <th>Ráfaga</th>
+                    <th>Duracion</th>
                     <th>Prioridad</th>
                 </tr>
                 </thead>    
                 <tbody>
-                    <tr>
-                        <th>Proceso 1</th>
-                        <th>10ms</th>
-                        <th>100ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 2</th>
-                        <th>2ms</th>
-                        <th>10ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 3</th>
-                        <th>4ms</th>
-                        <th>2ms</th>
-                        <th>0</th>
-                    </tr>
-                     <tr>
-                        <th>Proceso 1</th>
-                        <th>10ms</th>
-                        <th>100ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 2</th>
-                        <th>2ms</th>
-                        <th>10ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 3</th>
-                        <th>4ms</th>
-                        <th>2ms</th>
-                        <th>0</th>
-                    </tr>
-                     <tr>
-                        <th>Proceso 1</th>
-                        <th>10ms</th>
-                        <th>100ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 2</th>
-                        <th>2ms</th>
-                        <th>10ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 3</th>
-                        <th>4ms</th>
-                        <th>2ms</th>
-                        <th>0</th>
-                    </tr>
-                     <tr>
-                        <th>Proceso 1</th>
-                        <th>10ms</th>
-                        <th>100ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 2</th>
-                        <th>2ms</th>
-                        <th>10ms</th>
-                        <th>0</th>
-                    </tr>
-                    <tr>
-                        <th>Proceso 3</th>
-                        <th>4ms</th>
-                        <th>2ms</th>
-                        <th>0</th>
-                    </tr>
+
                 </tbody>
             </table>
             </div>
 
 
         <div id = "container-botones-procesos">
-            <div id = "agregar">
-                <button>Agregar</button>
-                <input type="text", placeholder="ID">
-                <input type="text", placeholder="Tiempo de Inicio">
-                <input type="text", placeholder="Duracion">
-                <input type="text", placeholder="Prioridad">
-            </div>
-            <div id = "eliminar">
-                <button>Eliminar</button>
-                <input type="text", placeholder="ID">
-            </div>
-            <div id = "modificar">
-                <button>Modificar</button>
-                <input type="search">
-                <input type="text", placeholder="Tiempo de Inicio">
-                <input type="text", placeholder="Duracion">
-                <input type="text", placeholder="Prioridad">
-            </div>
+            <form id="agregar">
+                <button type="submit">Agregar</button>
+                <input name="id" placeholder="ID">
+                <input name="llegada" placeholder="Tiempo de llegada">
+                <input name="duracion" placeholder="Duración">
+                <input name="prioridad" placeholder="Prioridad">
+            </form>
+
+            <form id="eliminar">
+                <button type="submit">Eliminar</button>
+                <input name="id" placeholder="ID a eliminar">
+            </form>
+
+            <form id="modificar">
+                <button type="submit">Modificar</button>
+                
+                <select name="id" id="select-id">
+                    <option value="">-- Selecciona un proceso --</option>
+                </select>
+                <input name="llegada" placeholder="Nuevo tiempo">
+                <input name="duracion" placeholder="Nueva duracion">
+                <input name="prioridad" placeholder="Nueva prioridad">
+            </form>
+
         </div>
         
         <div id = "marco-boton-aceptar">
