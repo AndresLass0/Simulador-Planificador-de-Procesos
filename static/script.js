@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await fetch("/modificar_proceso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, llegada, rafaga, prioridad })
+        body: JSON.stringify({ id, llegada, duracion, prioridad })
     }); 
 
     });
