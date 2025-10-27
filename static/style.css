@@ -3,12 +3,11 @@ body {
   font-family: Arial, sans-serif;
   text-align: center;
   
-  /* Estas tres líneas centran todo el contenido del body */
   display: flex;
   justify-content: space-around;
-  align-items: center;     /* centra verticalmente */
-  height: 100vh;           /* ocupa toda la altura de la pantalla */
-  margin: 0;               /* elimina márgenes por defecto */
+  align-items: center;    
+  height: 100vh;          
+  margin: 0;              
 }
 
 #panel-procesos{
@@ -166,7 +165,7 @@ body {
   background-color: #e74c4c;
 }
 
-/* ==== SECCIÓN MODIFICAR ==== */
+/* ==== SECCION MODIFICAR ==== */
 #modificar {
   width: 95%;
   text-align: left;
