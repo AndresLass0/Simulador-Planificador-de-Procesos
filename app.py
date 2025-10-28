@@ -70,8 +70,6 @@ def colas():
     return render_template('colas.html')
 
 
-
-
 @app.route('/') #Define la ruta
 def index(): #index es la ruta por defecto que llama flask
     procesos = []
