@@ -1,243 +1,62 @@
+
+:root {
+  --azul: #3498db;
+  --verde: #2ecc71;
+  --rojo: #e74c3c;
+  --dark: #2c3e50;
+  --light: #ecf0f1;
+}
+
+
 body {
-  background-color: #8bcfec;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  
-  display: flex;
-  justify-content: space-around;
-  align-items: center;    
-  height: 100vh;          
-  margin: 0;              
+  background-color: #f5f7fa;
+  color: var(--dark);
+  line-height: 1.6;
 }
 
-#panel-procesos{
-  width: 700px;      
-  height: 550px;
-  background-color: #fffffd;
-  border: 2px solid black;
-  border-radius: 10px;
-
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column; 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#tabla-container{
-  width: 100%;
-  height: 200px;
-  border-bottom: 2px solid black;
-  overflow-y: auto; /*scroll vertical */
 
-}
-
-#tabla-procesos {
-  width: 90%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 2px solid black;
-  border-radius: 10px;
+.todo-contenedor {
+  max-width: 1200px;
   margin: 0 auto;
-  margin-top: 1%;
-  margin-bottom: 1%;
+  padding: 20px;
 }
 
-/* Encabezado */
-#tabla-procesos thead th {
-  background-color: rgb(190, 117, 177);
-  color: white;
-  font-weight: bold;
-  padding: 5px;
-  border-bottom: 2px solid black;
+#tabla-izquierda{
+  background-color: var(--rojo);
+  border-radius: 10px;
 }
 
-
-#tabla-procesos thead th:first-child {
-  border-top-left-radius: 8px;
+#quantum{
+  display: none;
 }
-#tabla-procesos thead th:last-child {
-  border-top-right-radius: 8px;
+
+#agregar-procesos-fila-1{
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px;
 }
 
 
-
-#tabla-algoritmos {
-  width: 350px;      
-  height: 550px;
-  background-color: rgb(211, 210, 239);
-  border-radius: 10px;  
-  border: 2px solid black;  
-
-  /* Centrar el contenido interno */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column; 
-}
-
-/*========= BOTONES PROCESOS =========*/
-
-#container-botones-procesos{
-  width: 100%;
-  height: 200px;
-  margin-left: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-direction: column; /* si quieres que los hijos esten en columna */
+#agregar-procesos-fila-2{
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px; 
+  margin-top: 10px;
 }
 
 
-
-
-/*=========== BOTON ACEPTAR ============*/
-#marco-boton-aceptar{
-  width: 100%;
-  height: 70px;
-  align-content: center;
+#agregar-prioridad{
+  margin-top: 15px;
+  display: none;
 }
 
-#marco-boton-aceptar button{
-  width: 150px;
-  height: 50px;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: rgb(64, 241, 132);
-  color: rgb(0, 0, 0);
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#marco-boton-aceptar button:hover{
-  background-color: rgb(23, 199, 90);;
-}
-
-
-/*=========== BOTON AGREGAR ============*/
-#agregar input {
-  width: 120px;
-  margin: 4px;
-  padding: 4px 6px;
-  border-radius: 5px;
-  border: 1px solid gray;
-}
-
-#agregar button {
-  background-color: #77c8ff;
-  color: black;
-  border: 1px solid black;
-  border-radius: 6px;
-  padding: 6px 14px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#agregar button:hover {
-  background-color: #5bb7ee;
-}
-
-/* ==== SECCION ELIMINAR ==== */
-
-#eliminar {
-  width: 95%;
-  text-align: left;
-}
-
-#eliminar input {
-  margin: 4px;
-  padding: 4px 6px;
-  border-radius: 5px;
-  border: 1px solid gray;
-  width: 160px;
-}
-
-#eliminar button {
-  background-color: #f47474;
-  border: 1px solid black;
-  border-radius: 6px;
-  color: white;
-  font-weight: bold;
-  padding: 6px 14px;
-  cursor: pointer;
-}
-
-#eliminar button:hover {
-  background-color: #e74c4c;
-}
-
-/* ==== SECCION MODIFICAR ==== */
-#modificar {
-  width: 95%;
-  text-align: left;
-}
-
-#modificar input {
-  margin: 4px;
-  padding: 4px 6px;
-  border-radius: 5px;
-  border: 1px solid gray;
-  width: 100px;
-}
-
-#modificar button {
-  background-color: #ffc800;
-  border: 1px solid black;
-  border-radius: 6px;
-  color: white;
-  font-weight: bold;
-  padding: 6px 13px;
-  cursor: pointer;
-}
-
-
-/*=========== TABLA ALGORITMOS =========*/
-#titulo {
-  width:100%;
-  height:20%;
-  border-bottom: 2px solid black;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px ;
-  text-align: center;
-  background-color:rgb(172, 170, 224);
-}
-
-#panel-botones{
-    height: 400px;
-    width: 300px;
-    border-radius: 5px;
-    
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column; /* si quieres que los hijos esten en columna */
-
-    gap: 40px;
-}
-
-
-
-.botones{
-    background-color: #6bb5d5;
-    border-radius: 10px;
-    width: 250px;
-    height: 40px;
-    font-family: "Comic Sans MS", "Comic Sans";
-    font-size: 17px;
-    border-style: solid;
-
-}
-
-.botones:hover {
-  background-color: #f4e61a;
-  color: #ffffff;
-  transform: scale(1.3);
-}
-
-.botones.seleccionado {
-  background-color: #4caf50 !important; 
-  color: white;
-  transform: scale(1.1);
-  border: 2px solid black;
+#boton-agregar-proceso{
+   margin-top: 15px;
 }
