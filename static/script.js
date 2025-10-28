@@ -111,6 +111,55 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+
+    // Esto es que los botones cambien segun la seleccion
+
+    const botones = document.querySelectorAll('.botones');
+
+    botones.forEach(boton => {
+    boton.addEventListener('click', () => {
+    
+      botones.forEach(b => b.classList.remove('seleccionado'));
+
+      boton.classList.add('seleccionado');
+
+      console.log("Algoritmo seleccionado:", boton.textContent.trim());
+    });
+  });
+
+  // === INICIAR ===
+  document.getElementById("boton-aceptar").addEventListener("click", () => {
+    const seleccionado = document.querySelector(".botones.seleccionado");
+
+    if (!seleccionado) {
+      alert("Por favor, selecciona un algoritmo antes de iniciar.");
+      return;
+    }
+
+    const algoritmo = seleccionado.textContent.trim();
+
+    // Dependiendo del texto, redirigir a una página distinta
+    switch (algoritmo) {
+      case "First Come, First Served":
+        window.location.href = "/fcfs";
+        break;
+      case "Shorest Job First":
+        window.location.href = "/sjf";
+        break;
+      case "Por Prioridad":
+        window.location.href = "/prioridad";
+        break;
+      case "Round Robin":
+        window.location.href = "/rr";
+        break;
+      case "Colas Multiples de Nivel":
+        window.location.href = "/colas";
+        break;
+      default:
+        alert("Algoritmo no reconocido.");
+    }
+  });
+
 });
 
 function actualizarSelectIDs() {
