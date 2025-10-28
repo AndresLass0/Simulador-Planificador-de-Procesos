@@ -8,9 +8,8 @@
 <body>
     <div class = "todo-contenedor">
         <div id = "tabla-izquierda">
-            <div id = "titulo">
-                <h1>Algoritmos de planificación</h1>
-            </div>
+
+           <h2>Algoritmos de planificación</h2>
             
             <div class="form-procesos">
                 <label for="algoritmo">Algoritmo de Planificación:</label>
@@ -22,112 +21,67 @@
                     <option value="priority">Por Prioridad</option>
                 </select>
             </div>
-
-        <!--QUANTOM RR-->
-            <div class="form-procesos" id="quantum">
-                <label for="quantum">Quantum:</label>
-                <input type="number" id="quantum" min="1" value="2">
-            </div>
+            
 
             <div class="form-procesos">
                 <h3>Agregar Proceso</h3>
                 <div id = "agregar-procesos-fila-1">
                     <div>
-                        <label for="process-name">Nombre:</label>   
-                        <input type="text" id="process-name" placeholder="P1">
+                        <label for="input-id-proceso">Nombre:</label>   
+                        <input type="text" id="input-id-proceso" placeholder="P1">
                     </div>
                     <div>
-                        <label for="process-color">Color:</label>
-                        <input type="color" id="process-color" value="#3418db">
+                        <label for="color-input">Color:</label>
+                        <input type="color" id="color-input" value="#3418db">
                     </div>
                 </div>
                 
                 <div id = "agregar-procesos-fila-2">
                     <div>
-                        <label for="arrival-time">Tiempo de Llegada:</label>
-                        <input type="number" id="arrival-time" min="0" value="0">
+                        <label for="input-llegada-proceso">Tiempo de Llegada:</label>
+                        <input type="number" id="input-llegada-proceso" min="0" value="0">
                     </div>
                     <div>
-                        <label for="burst-time">Duración:</label> 
-                        <input type="number" id="burst-time" min="1" value="3">
+                        <label for="input-duracion-proceso">Duración:</label> 
+                        <input type="number" id="input-duracion-proceso" min="1" value="3">
                     </div>
                 </div>
                 
                 <div id="agregar-prioridad">
                     <label for="prioridad">Prioridad (menor = mas prioridad):</label>
-                    <input type="number" min="1" value="1">
+                    <input type="number" id = "prioridad" min ="1" value="1">
+                </div>
+
+                <div id="agregar-quantum">
+                    <label for="quantum">Quantum:</label>
+                    <input type="number" id="quantum" min="1" value="2">
                 </div>
                 
                 <button id="boton-agregar-proceso">Agregar Proceso</button>
             </div>
 
-            <div class="process-list">
+            <div class="lista-procesos">
                 <h3>Procesos Agregados</h3>
-                <div id="processes-container">
+                <div id="procesos-container">
                     <!-- aqui van los procesos -->
                 </div>
             </div>
             
-            <div class="controls">
-                <button id="play-btn">Iniciar Simulación</button>
-                <button id="stop-btn">Pausar</button>
-                <button id="reset-btn">Reiniciar</button>
+            <div id="botones">
+                <button id="boton-iniciar">Iniciar Simulación</button>
+                <button id="boton-parar">Pausar</button>
+                <button id="boton-reiniciar">Reiniciar</button>
             </div>
+        </div>
+
+        <div id = "tabla-derecha">
+            <h2>Simulación</h2>
         </div>
 
         
 
-        <div id = "panel-procesos">
-            <div id="tabla-container">
-                <table id="tabla-procesos">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tiempo de llegada</th>
-                        <th>Duracion</th>
-                        <th>Prioridad</th>
-                    </tr>
-                    </thead>    
-                    <tbody>
+     
 
-                    </tbody>
-                </table>
-                </div>
-
-
-            <div id = "container-botones-procesos">
-                <form id="agregar">
-                    <button type="submit">Agregar</button>
-                    <input name="id" placeholder="ID">
-                    <input name="llegada" placeholder="Tiempo de llegada">
-                    <input name="duracion" placeholder="Duración">
-                    <input name="prioridad" placeholder="Prioridad">
-                </form>
-
-                <form id="eliminar">
-                    <button type="submit">Eliminar</button>
-                    <input name="id" placeholder="ID a eliminar">
-                </form>
-
-                <form id="modificar">
-                    <button type="submit">Modificar</button>
-                        
-                    <select name="id" id="select-id">
-                        <option value="">-- Selecciona un proceso --</option>
-                    </select>
-                    <input name="llegada" placeholder="Nuevo tiempo">
-                    <input name="duracion" placeholder="Nueva duracion">
-                    <input name="prioridad" placeholder="Nueva prioridad">
-                </form>
-
-            </div>
-            
-            <div id = "marco-boton-aceptar">
-                <button id = "boton-aceptar">Iniciar</button>
-            </div>
-
-        </div>
-    </div>
         
 </body>
 </html>

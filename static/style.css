@@ -26,16 +26,18 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
 }
 
+/* IZQUIERDA - PROCESOS/ALGORITMOS */
 #tabla-izquierda{
   background-color: var(--rojo);
   border-radius: 10px;
+  border: 2px solid black;
 }
 
-#quantum{
-  display: none;
-}
 
 #agregar-procesos-fila-1{
   display: grid; 
@@ -57,6 +59,48 @@ body {
   display: none;
 }
 
+#agregar-quantum{
+  margin-top: 15px;
+  display: none;
+}
+
+
 #boton-agregar-proceso{
    margin-top: 15px;
+}
+
+
+/*COSAS VARIADAS*/
+.form-procesos{
+  margin-top: 15px;
+  border: 1px solid black;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+#color-input{
+  height: 55%;
+  width: 50%;
+  padding: 1px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+
+/* DERECHA - SIMULACION */
+#tabla-derecha{
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid black;
 }
