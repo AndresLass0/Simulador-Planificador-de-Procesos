@@ -47,29 +47,6 @@ def modificar():
     return {"ok" : "ok"}
 
 
-# AQUI VA TODAS NUEVAS DIRECCIONES DE LAS PAGINAS
-
-@app.route('/fcfs')
-def fcfs():
-    return render_template('fcfs.html')
-
-@app.route('/sjf')
-def sjf():
-    return render_template('sjf.html')
-
-@app.route('/prioridad')
-def prioridad():
-    return render_template('prioridad.html')
-
-@app.route('/rr')
-def rr():
-    return render_template('rr.html')
-
-@app.route('/colas')
-def colas():
-    return render_template('colas.html')
-
-
 @app.route('/') #Define la ruta
 def index(): #index es la ruta por defecto que llama flask
     procesos = []
