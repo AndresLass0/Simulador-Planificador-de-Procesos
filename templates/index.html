@@ -4,6 +4,8 @@
     <title>Simulador de Planificación</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="/static/script.js" defer></script>
+    <script src="/static/algoritmos/colas_multiples.js" defer></script>
+    <script src="/static/algoritmos/round_robin.js" defer></script>
 </head>
 <body>
     <div id = "panel-procesos">
@@ -66,10 +68,25 @@
             <button class = "botones"> First Come, First Served</button>
             <button class = "botones"> Shorest Job First</button>
             <button class = "botones"> Por Prioridad </button>
-            <button class = "botones"> Round Robin </button>
-            <button class = "botones"> Colas Multiples de Nivel </button>
+            <button class = "botones" id="btn-round-robin"> Round Robin </button>
+            <button class = "botones" id="btn-colas-multiples"> Colas Multiples de Nivel </button>
         </div>
     </div>
     
+<div id="resultados-simulacion">
+        <h2>Resultados de la Simulación</h2>
+        <div id="gantt-chart"></div> <table id="tabla-resultados">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>T. Retorno</th>
+                    <th>T. Espera</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
 </body>
 </html>
