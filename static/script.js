@@ -100,7 +100,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function iniciarSimulacion() {
     if (listaProcesos.length === 0 || simulacionCorriendo) return;
     simulacionCorriendo = true;
+    reiniciarEstadoSimulacion();
     intervaloSimulacion = setInterval(pasoDeSimulacion, 700);
+  }
+
+  function reiniciarEstadoSimulacion() {
+    tiempoActual = 0;
+    procesoEnEjecucion = null;
+    quantumCounter = 0;
+    colaAltaPrioridad = [];
+    colaBajaPrioridad = [];
+    cuerpoGantt.innerHTML = '';
+
+    listaProcesos.forEach(p => {
+      p.tiempoRestante = p.duracion;
+      p.tiempoFinalizacion = undefined;
+      p.tiempoEspera = undefined;
+      p.tiempoRetorno = undefined;
+      p.haSidoDegradado = false;
+    });
   }
 
   function pasoDeSimulacion() {
@@ -127,6 +145,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    dibujarTablaResultados();
+    actualizarEstadisticas();
+    tiempoActual++;
   }
 
   function seleccionarProximoProceso() {
@@ -208,7 +229,35 @@ document.addEventListener("DOMContentLoaded", () => {
     cuerpoGantt.parentElement.scrollLeft = cuerpoGantt.parentElement.scrollWidth;
   }
 
-  
+  function dibujarTablaResultados() {
+    cuerpoTablaResultados.innerHTML = '';
+    listaProcesos.forEach(p => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+                <td style="color: ${p.color}; font-weight: bold;">${p.nombre}</td>
+                <td>${p.llegada}</td>
+                <td>${p.duracion}</td>
+                <td>${selectorAlgoritmo.value === 'priority' ? p.prioridad : '-'}</td>
+                <td>${p.tiempoFinalizacion || '-'}</td>
+                <td>${p.tiempoEspera !== undefined && p.tiempoFinalizacion ? p.tiempoEspera : '-'}</td>
+                <td>${p.tiempoRetorno || '-'}</td>
+            `;
+      cuerpoTablaResultados.appendChild(fila);
+    });
+  }
+
+  function actualizarEstadisticas(resetear = false) {
+    const completados = listaProcesos.filter(p => p.tiempoFinalizacion);
+    if (resetear || completados.length === 0) {
+      elEsperaPromedio.innerText = '0.00';
+      elRetornoPromedio.innerText = '0.00';
+      return;
+    }
+    const totalEspera = completados.reduce((sum, p) => sum + p.tiempoEspera, 0);
+    const totalRetorno = completados.reduce((sum, p) => sum + p.tiempoRetorno, 0);
+    elEsperaPromedio.innerText = (totalEspera / completados.length).toFixed(2);
+    elRetornoPromedio.innerText = (totalRetorno / completados.length).toFixed(2);
+  }
 
   gestionarCamposAlgoritmo();
 });
