@@ -75,7 +75,39 @@
         </div>
 
         <div id = "tabla-derecha">
-            <h2>Simulación</h2>
+            <h2>Simulación</h2> 
+            <div class="diagrama-gantt">
+                <div class="diagrama-encabezado" id="encabezado-gantt"></div>
+                <div class="diagrama-cuerpo" id="cuerpo-gantt"></div>
+            </div>
+            
+            <h2>Tabla de Resultados Finales</h2>
+            <table class="tabla-resultados">
+                <thead>
+                    <tr>
+                        <th>Proceso</th>
+                        <th>Llegada</th>
+                        <th>Duración</th>
+                        <th>Prioridad</th>
+                        <th>Finalización</th>
+                        <th>T. de Espera</th>
+                        <th>T. de Retorno</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla-resultados">
+                </tbody>
+            </table>
+            
+            <div class="contenedor-estadisticas">
+                <div class="tarjeta-estadistica">
+                    <div class="valor-estadistica" id="espera-promedio">0</div>
+                    <div class="etiqueta-estadistica">Espera Promedio</div>
+                </div>
+                <div class="tarjeta-estadistica">
+                    <div class="valor-estadistica" id="retorno-promedio">0</div>
+                    <div class="etiqueta-estadistica">Retorno Promedio</div>
+                </div>
+            </div>
         </div>
 
         

@@ -1,4 +1,3 @@
-
 :root {
   --azul: #3498db;
   --verde: #2ecc71;
@@ -7,85 +6,61 @@
   --light: #ecf0f1;
 }
 
-
 body {
   background-color: #f5f7fa;
   color: var(--dark);
   line-height: 1.6;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-
 .todo-contenedor {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1300px;
+  margin: 20px auto;
   padding: 20px;
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 20px;
 }
 
-/* IZQUIERDA - PROCESOS/ALGORITMOS */
-#tabla-izquierda{
-  background-color: var(--rojo);
+#tabla-izquierda {
+  background-color: white;
+  padding: 20px;
   border-radius: 10px;
-  border: 2px solid black;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-
-#agregar-procesos-fila-1{
-  display: grid; 
-  grid-template-columns: 1fr 1fr; 
-  gap: 10px;
+.form-procesos, .lista-procesos, #botones {
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
 }
 
-
-#agregar-procesos-fila-2{
+#agregar-procesos-fila-1, #agregar-procesos-fila-2 {
   display: grid; 
   grid-template-columns: 1fr 1fr; 
-  gap: 10px; 
+  gap: 15px; 
   margin-top: 10px;
 }
 
-
-#agregar-prioridad{
+#agregar-prioridad, #agregar-quantum {
   margin-top: 15px;
-  display: none;
-}
-
-#agregar-quantum{
-  margin-top: 15px;
-  display: none;
-}
-
-
-#boton-agregar-proceso{
-   margin-top: 15px;
-}
-
-
-/*COSAS VARIADAS*/
-.form-procesos{
-  margin-top: 15px;
-  border: 1px solid black;
+  display: none; 
 }
 
 label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-}
-
-#color-input{
-  height: 55%;
-  width: 50%;
-  padding: 1px;
+  font-size: 0.9rem;
 }
 
 input, select, button {
@@ -96,11 +71,98 @@ input, select, button {
   font-size: 1rem;
 }
 
+#color-input {
+    padding: 5px; 
+}
 
-/* DERECHA - SIMULACION */
-#tabla-derecha{
+button {
+  cursor: pointer;
+  background-color: var(--azul);
+  color: white;
+  border: none;
+  transition: opacity 0.2s;
+}
+button:hover {
+  opacity: 0.85;
+}
+#boton-agregar-proceso {
+    margin-top: 15px;
+}
+#botones {
+    display: flex;
+    gap: 10px;
+}
+
+#tabla-derecha {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  border: 2px solid black;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+h2 {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--light);
+}
+
+.diagrama-gantt {
+    margin-top: 20px;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+.diagrama-cuerpo {
+    display: flex;
+    height: 50px;
+    margin-top: 5px;
+}
+.bloque-gantt {
+    min-width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+.tabla-resultados {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+.tabla-resultados th, .tabla-resultados td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+.tabla-resultados th {
+    background-color: var(--azul);
+    color: white;
+}
+.contenedor-estadisticas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 25px;
+}
+.tarjeta-estadistica {
+    background-color: var(--light);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.valor-estadistica {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--dark);
+}
+.etiqueta-estadistica {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 5px;
 }
