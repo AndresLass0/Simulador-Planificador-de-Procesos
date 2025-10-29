@@ -33,7 +33,7 @@ body {
 
 /* IZQUIERDA - PROCESOS/ALGORITMOS */
 #tabla-izquierda{
-  background-color: var(--rojo);
+  background-color: white;
   border-radius: 10px;
   border: 2px solid black;
 }
@@ -71,6 +71,9 @@ body {
 
 
 /*COSAS VARIADAS*/
+#color-input, #algoritmos{
+  cursor: pointer;
+}
 .form-procesos{
   margin-top: 15px;
   border: 1px solid black;
@@ -96,6 +99,56 @@ input, select, button {
   font-size: 1rem;
 }
 
+#boton-agregar-proceso{
+  background-color: #5fd7d3;
+  cursor: pointer;
+  font-weight: 600;
+  
+}
+
+#boton-agregar-proceso:hover{
+  background-color: #20e093;
+  transition: background-color 0.3s;
+}
+
+
+#botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#boton-iniciar{
+  background-color: #00f365;
+  cursor: pointer;
+  
+}
+
+#boton-iniciar:hover{
+  background-color: var(--verde);
+  transition: background-color 0.3s;
+}
+
+#boton-pausar{
+  background-color: var(--rojo);
+  cursor: pointer;
+}
+
+#boton-pausar:hover{
+  background-color: #be1e0f;
+  transition: background-color 0.3s;
+}
+
+#boton-reiniciar{
+  background-color:#f69e0f;
+  cursor: pointer;
+}
+
+#boton-reiniciar:hover{
+  background-color: #f56308;
+  transition: background-color 0.3s;
+}
+
 
 /* DERECHA - SIMULACION */
 #tabla-derecha{
@@ -104,3 +157,4 @@ input, select, button {
   border-radius: 10px;
   border: 2px solid black;
 }
+
