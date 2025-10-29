@@ -166,3 +166,15 @@ h2 {
     color: #555;
     margin-top: 5px;
 }
+
+#botones #boton-iniciar {
+  background-color: var(--verde); 
+}
+
+#botones #boton-parar {
+  background-color: var(--rojo);
+} 
+
+#botones #boton-reiniciar {
+  background-color: #f39c12; 
+}
