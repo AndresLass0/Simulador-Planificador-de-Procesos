@@ -1,180 +1,101 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const selectorAlgoritmo = document.getElementById("algoritmos");
+  const campoQuantum = document.getElementById("agregar-quantum");
+  const campoPrioridad = document.getElementById("agregar-prioridad");
+  const botonAgregarProceso = document.getElementById("boton-agregar-proceso");
+  const contenedorProcesos = document.getElementById("procesos-container");
 
-  const tabla = document.querySelector("#tabla-procesos tbody");
+  const botonIniciar = document.getElementById("boton-iniciar");
+  const botonPausar = document.getElementById("boton-parar");
+  const botonReiniciar = document.getElementById("boton-reiniciar");
 
-  // === AGREGAR ===
-  document.getElementById("agregar").addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const cuerpoGantt = document.getElementById("cuerpo-gantt");
+  const cuerpoTablaResultados = document.getElementById("cuerpo-tabla-resultados");
+  const elEsperaPromedio = document.getElementById("espera-promedio");
+  const elRetornoPromedio = document.getElementById("retorno-promedio");
 
-    const id = e.target.id.value;
-    const llegada = e.target.llegada.value;
-    const duracion = e.target.duracion.value;
-    const prioridad = e.target.prioridad.value;
+  let listaProcesos = [];
+  let intervaloSimulacion;
+  let tiempoActual = 0;
+  let simulacionCorriendo = false;
+  let contadorIdProceso = 1;
 
-    if (!id || !llegada || !duracion || !prioridad) {
-        alert("Ups!, Por favor, completa todos los campos antes de agregar el proceso.");
-        return; // Evita que siga ejecutando
-    }
+  let procesoEnEjecucion = null;
+  let quantumCounter = 0;
 
+  let colaAltaPrioridad = [];
+  let colaBajaPrioridad = [];
 
-    // Crear fila nueva
-    const fila = document.createElement("tr");
-    fila.innerHTML = `
-      <th>${id}</th>
-      <th>${llegada}</th>
-      <th>${duracion}</th>
-      <th>${prioridad}</th>
-    `;
+  //eventos  
+  selectorAlgoritmo.addEventListener("change", gestionarCamposAlgoritmo);
+  botonAgregarProceso.addEventListener("click", agregarProceso);
+  botonIniciar.addEventListener("click", iniciarSimulacion);
+  botonPausar.addEventListener("click", pausarSimulacion);
+  botonReiniciar.addEventListener("click", reiniciarSimulacion);
 
-    tabla.appendChild(fila);
-    actualizarSelectIDs();
+  function gestionarCamposAlgoritmo() {
+    const esRR = selectorAlgoritmo.value === 'rr';
+    const esMLQ = selectorAlgoritmo.value === 'mlq';
+    campoQuantum.style.display = esRR || esMLQ ? 'block' : 'none';
+    campoPrioridad.style.display = selectorAlgoritmo.value === 'priority' ? 'block' : 'none';
+    dibujarListaProcesos();
+  }
 
-    // Limpiar inputs
-    e.target.reset();
+  function agregarProceso() {
+    const nombre = document.getElementById("input-id-proceso").value || `P${contadorIdProceso}`;
+    const color = document.getElementById("color-input").value;
+    const llegada = parseInt(document.getElementById("input-llegada-proceso").value);
+    const duracion = parseInt(document.getElementById("input-duracion-proceso").value);
+    const prioridad = parseInt(document.getElementById("prioridad").value);
 
-    // Enviar a backend
-    await fetch("/agregar_proceso", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, llegada, duracion, prioridad })
-    });
-
-    
-  });
-
-  // === ELIMINAR ===
-  document.getElementById("eliminar").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const id = e.target.id.value;
-
-    if (!id) {
-        alert("Ups!, Por favor, completa todos los campos antes de eliminar el proceso.");
-        return; // Evita que siga ejecutando
-    }
-
-    const filas = tabla.querySelectorAll("tr");
-    for (const fila of filas) {
-      if (fila.children[0].textContent === id) {
-        fila.remove();
-        break;
-      }
-    }
-
-    actualizarSelectIDs();
-    // Limpiar input
-    e.target.reset();
-
-    // Enviar al backend
-    await fetch("/eliminar_proceso", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id })
-    });
-  });
-
-  // === MODIFICAR ===
-  document.getElementById("modificar").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const id = e.target.id.value; // viene del <select>
-    const llegada = e.target.llegada.value;
-    const duracion = e.target.duracion.value;
-    const prioridad = e.target.prioridad.value;
-
-    if (!id) {
-        alert("Selecciona un proceso para modificar.");
-        return;
-    }
-
-    // Buscar fila y modificarla
-    const filas = document.querySelectorAll("#tabla-procesos tbody tr");
-    for (const fila of filas) {
-        if (fila.children[0].textContent === id) {
-        if (llegada) fila.children[1].textContent = llegada;
-        if (duracion) fila.children[2].textContent = duracion;
-        if (prioridad) fila.children[3].textContent = prioridad;
-        break;
-        }
-    }
-
-    // Limpiar formulario
-    e.target.reset();
-
-    // Enviar al backend
-    await fetch("/modificar_proceso", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, llegada, duracion, prioridad })
-    }); 
-
-    });
-
-
-
-    // Esto es que los botones cambien segun la seleccion
-
-    const botones = document.querySelectorAll('.botones');
-
-    botones.forEach(boton => {
-    boton.addEventListener('click', () => {
-    
-      botones.forEach(b => b.classList.remove('seleccionado'));
-
-      boton.classList.add('seleccionado');
-
-      console.log("Algoritmo seleccionado:", boton.textContent.trim());
-    });
-  });
-
-  // === INICIAR ===
-  document.getElementById("boton-aceptar").addEventListener("click", () => {
-    const seleccionado = document.querySelector(".botones.seleccionado");
-
-    if (!seleccionado) {
-      alert("Por favor, selecciona un algoritmo antes de iniciar.");
+    if (isNaN(duracion) || duracion <= 0) {
+      alert('La duración debe ser un número mayor a 0.');
       return;
     }
 
-    const algoritmo = seleccionado.textContent.trim();
+    const proceso = {
+      id: contadorIdProceso,
+      nombre, color, llegada, duracion, prioridad,
+      tiempoRestante: duracion,
+      haSidoDegradado: false
+    };
+    listaProcesos.push(proceso);
+    contadorIdProceso++;
+    dibujarListaProcesos();
+    document.getElementById("input-id-proceso").value = '';
+  }
 
-    // Dependiendo del texto, redirigir a una página distinta
-    switch (algoritmo) {
-      case "First Come, First Served":
-        window.location.href = "/fcfs";
-        break;
-      case "Shorest Job First":
-        window.location.href = "/sjf";
-        break;
-      case "Por Prioridad":
-        window.location.href = "/prioridad";
-        break;
-      case "Round Robin":
-        window.location.href = "/rr";
-        break;
-      case "Colas Multiples de Nivel":
-        window.location.href = "/colas";
-        break;
-      default:
-        alert("Algoritmo no reconocido.");
-    }
-  });
+  function dibujarListaProcesos() {
+    contenedorProcesos.innerHTML = '';
+    listaProcesos.forEach((proceso, indice) => {
+      const elementoProceso = document.createElement('div');
+      elementoProceso.className = 'elemento-proceso';
+
+      const prioridadInfo = selectorAlgoritmo.value === 'priority' ?
+        `<span class="info-detalle">Prioridad: ${proceso.prioridad}</span>` : '';
+
+      elementoProceso.innerHTML = `
+            <div class="info-proceso">
+                <div class="color-dot" style="background-color: ${proceso.color};"></div>
+                <div class="texto-info">
+                    <strong>${proceso.nombre}</strong>
+                    <span class="info-detalle">Llegada: ${proceso.llegada}</span>
+                    <span class="info-detalle">Duración: ${proceso.duracion}</span>
+                    ${prioridadInfo}
+                </div>
+            </div>
+            <button class="boton-eliminar-proceso" data-indice="${indice}">Eliminar</button>`;
+      contenedorProcesos.appendChild(elementoProceso);
+    });
+
+    contenedorProcesos.querySelectorAll('.boton-eliminar-proceso').forEach(boton => {
+      boton.addEventListener('click', (e) => {
+        listaProcesos.splice(e.target.dataset.indice, 1);
+        dibujarListaProcesos();
+      });
+    });
+  }
+
+  gestionarCamposAlgoritmo();
 
 });
-
-function actualizarSelectIDs() {
-  const select = document.getElementById("select-id");
-  const filas = document.querySelectorAll("#tabla-procesos tbody tr");
-
-  // Limpia las opciones previas
-  select.innerHTML = '<option value="">-- Selecciona un proceso --</option>';
-
-  // Agrega una opcion por cada fila existente
-  filas.forEach(fila => {
-    const id = fila.children[0].textContent;
-    const option = document.createElement("option");
-    option.value = id;
-    option.textContent = id;
-    select.appendChild(option);
-  });
-}
