@@ -178,3 +178,75 @@ h2 {
 #botones #boton-reiniciar {
   background-color: #f39c12; 
 }
+
+.elemento-proceso {
+    display: flex;
+    justify-content: space-around;
+    align-items: center; 
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 10px 0; 
+}
+
+.info-proceso {
+    flex-basis: 45%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.texto-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.texto-info strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 4px;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    line-height: 1;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #343a40;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.boton-eliminar-proceso {
+    flex-basis: 40%;
+    background-color: var(--rojo);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+    padding: 10px 0;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.boton-eliminar-proceso:hover {
+    background-color: #c82333;
+}

@@ -84,7 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${prioridadInfo}
                 </div>
             </div>
-            <button class="boton-eliminar-proceso" data-indice="${indice}">Eliminar</button>`;
+            <button class="boton-eliminar-proceso" data-indice="${indice}">Eliminar</button>
+        `;
       contenedorProcesos.appendChild(elementoProceso);
     });
 
@@ -96,6 +97,118 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  gestionarCamposAlgoritmo();
+  function iniciarSimulacion() {
+    if (listaProcesos.length === 0 || simulacionCorriendo) return;
+    simulacionCorriendo = true;
+    intervaloSimulacion = setInterval(pasoDeSimulacion, 700);
+  }
 
+  function pasoDeSimulacion() {
+    // se anaden los procesos nuevos a las colas
+    listaProcesos.forEach(p => {
+      if (p.llegada === tiempoActual) {
+        // para MLQ y otros, todos empiezan en la de alta prioridad
+        colaAltaPrioridad.push(p);
+      }
+    });
+
+    // eleccionamos el próximo proceso
+    seleccionarProximoProceso();
+
+    dibujarEnGantt(procesoEnEjecucion);
+
+    if (procesoEnEjecucion) {
+      procesoEnEjecucion.tiempoRestante--;
+      quantumCounter++;
+
+      if (procesoEnEjecucion.tiempoRestante === 0) {
+        finalizarProceso(procesoEnEjecucion);
+        procesoEnEjecucion = null;
+      }
+    }
+
+  }
+
+  function seleccionarProximoProceso() {
+    const algoritmo = selectorAlgoritmo.value;
+    const quantum = parseInt(document.getElementById('quantum').value);
+    let debeCambiar = false;
+
+    const esDeColaAlta = algoritmo === 'rr' || (algoritmo === 'mlq' && procesoEnEjecucion && !procesoEnEjecucion.haSidoDegradado);
+
+    if (esDeColaAlta && quantumCounter >= quantum) {
+      if (procesoEnEjecucion.tiempoRestante > 0) {
+        if (algoritmo === 'mlq') {
+          procesoEnEjecucion.haSidoDegradado = true;
+          colaBajaPrioridad.push(procesoEnEjecucion);
+        } else {
+          colaAltaPrioridad.push(procesoEnEjecucion);
+        }
+      }
+      procesoEnEjecucion = null;
+      debeCambiar = true;
+    }
+
+    // para algoritmos apropiativos (srtf y prioridad)
+    if (algoritmo === 'srtf' || algoritmo === 'priority') {
+      let colaUnificada = [...colaAltaPrioridad, ...colaBajaPrioridad];
+      if (colaUnificada.length > 0) {
+        colaUnificada.sort((a, b) => algoritmo === 'srtf' ? a.tiempoRestante - b.tiempoRestante : a.prioridad - b.prioridad);
+        if (procesoEnEjecucion !== colaUnificada[0]) {
+          procesoEnEjecucion = colaUnificada[0];
+          quantumCounter = 0;
+        }
+      }
+      return;
+    }
+
+    // para seleccionar nuevo proceso si la CPU esta libre
+    if (procesoEnEjecucion === null) {
+      if (algoritmo === 'mlq') {
+        if (colaAltaPrioridad.length > 0) {
+          procesoEnEjecucion = colaAltaPrioridad.shift();
+        } else if (colaBajaPrioridad.length > 0) {
+          procesoEnEjecucion = colaBajaPrioridad.shift();
+        }
+      } else { // para fcfs, sjf, rr
+        let colaListos = colaAltaPrioridad;
+        if (colaListos.length > 0) {
+          if (algoritmo === 'sjf') {
+            colaListos.sort((a, b) => a.duracion - b.duracion);
+          }
+          procesoEnEjecucion = colaListos.shift();
+        }
+      }
+      quantumCounter = 0;
+    }
+  }
+
+  function finalizarProceso(proceso) {
+    proceso.tiempoFinalizacion = tiempoActual + 1;
+    proceso.tiempoRetorno = proceso.tiempoFinalizacion - proceso.llegada;
+    proceso.tiempoEspera = proceso.tiempoRetorno - proceso.duracion;
+
+    let indiceEnColaAlta = colaAltaPrioridad.findIndex(p => p.id === proceso.id);
+    if (indiceEnColaAlta > -1) colaAltaPrioridad.splice(indiceEnColaAlta, 1);
+
+    let indiceEnColaBaja = colaBajaPrioridad.findIndex(p => p.id === proceso.id);
+    if (indiceEnColaBaja > -1) colaBajaPrioridad.splice(indiceEnColaBaja, 1);
+  }
+
+  function dibujarEnGantt(proceso) {
+    const bloque = document.createElement('div');
+    bloque.className = 'bloque-gantt';
+    if (proceso) {
+      bloque.style.backgroundColor = proceso.color;
+      bloque.innerText = proceso.nombre;
+    } else {
+      bloque.style.backgroundColor = '#E0E0E0';
+    }
+    cuerpoGantt.appendChild(bloque);
+    cuerpoGantt.parentElement.scrollLeft = cuerpoGantt.parentElement.scrollWidth;
+  }
+
+  
+
+  gestionarCamposAlgoritmo();
 });
