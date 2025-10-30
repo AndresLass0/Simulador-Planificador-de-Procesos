@@ -104,6 +104,21 @@ document.addEventListener("DOMContentLoaded", () => {
     intervaloSimulacion = setInterval(pasoDeSimulacion, 700);
   }
 
+  function pausarSimulacion() {
+    simulacionCorriendo = false;
+    clearInterval(intervaloSimulacion);
+  }
+
+  function reiniciarSimulacion() {
+    pausarSimulacion();
+    listaProcesos = [];
+    contadorIdProceso = 1;
+    reiniciarEstadoSimulacion();
+    dibujarListaProcesos();
+    cuerpoTablaResultados.innerHTML = '';
+    actualizarEstadisticas(true);
+  }
+
   function reiniciarEstadoSimulacion() {
     tiempoActual = 0;
     procesoEnEjecucion = null;
@@ -148,6 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
     dibujarTablaResultados();
     actualizarEstadisticas();
     tiempoActual++;
+
+    if (listaProcesos.every(p => p.tiempoRestante === 0)) {
+      pausarSimulacion();
+    }
   }
 
   function seleccionarProximoProceso() {
