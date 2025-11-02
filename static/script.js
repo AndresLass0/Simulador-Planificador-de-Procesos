@@ -1,282 +1,243 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const selectorAlgoritmo = document.getElementById("algoritmos");
-  const campoQuantum = document.getElementById("agregar-quantum");
-  const campoPrioridad = document.getElementById("agregar-prioridad");
-  const botonAgregarProceso = document.getElementById("boton-agregar-proceso");
-  const contenedorProcesos = document.getElementById("procesos-container");
 
-  const botonIniciar = document.getElementById("boton-iniciar");
-  const botonPausar = document.getElementById("boton-parar");
-  const botonReiniciar = document.getElementById("boton-reiniciar");
+let unProcesoAgregado = false;
+let algoritmoActual;
 
-  const cuerpoGantt = document.getElementById("cuerpo-gantt");
-  const cuerpoTablaResultados = document.getElementById("cuerpo-tabla-resultados");
-  const elEsperaPromedio = document.getElementById("espera-promedio");
-  const elRetornoPromedio = document.getElementById("retorno-promedio");
+document.addEventListener("DOMContentLoaded", inicializarEventos);
 
-  let listaProcesos = [];
-  let intervaloSimulacion;
-  let tiempoActual = 0;
-  let simulacionCorriendo = false;
-  let contadorIdProceso = 1;
+function inicializarEventos() {
+    const algoritmoSelect = document.getElementById('algoritmos');
+    algoritmoSelect.addEventListener('change', obtenerAlgoritmoActual);
 
-  let procesoEnEjecucion = null;
-  let quantumCounter = 0;
+    obtenerAlgoritmoActual();
+    cargarProcesos();
 
-  let colaAltaPrioridad = [];
-  let colaBajaPrioridad = [];
+}
 
-  //eventos  
-  selectorAlgoritmo.addEventListener("change", gestionarCamposAlgoritmo);
-  botonAgregarProceso.addEventListener("click", agregarProceso);
-  botonIniciar.addEventListener("click", iniciarSimulacion);
-  botonPausar.addEventListener("click", pausarSimulacion);
-  botonReiniciar.addEventListener("click", reiniciarSimulacion);
+function obtenerAlgoritmoActual() {
+   // Ver que algoritmo esta escojido
+    const algoritmoSelect = document.getElementById('algoritmos');
+    const algoritmo = algoritmoSelect.value;
 
-  function gestionarCamposAlgoritmo() {
-    const esRR = selectorAlgoritmo.value === 'rr';
-    const esMLQ = selectorAlgoritmo.value === 'mlq';
-    campoQuantum.style.display = esRR || esMLQ ? 'block' : 'none';
-    campoPrioridad.style.display = selectorAlgoritmo.value === 'priority' ? 'block' : 'none';
-    dibujarListaProcesos();
-  }
+    // Variables a modificar
+    const prioridadDiv = document.getElementById('agregar-prioridad');
+    const quantumDiv = document.getElementById('agregar-quantum');
 
-  function agregarProceso() {
-    const nombre = document.getElementById("input-id-proceso").value || `P${contadorIdProceso}`;
-    const color = document.getElementById("color-input").value;
-    const llegada = parseInt(document.getElementById("input-llegada-proceso").value);
-    const duracion = parseInt(document.getElementById("input-duracion-proceso").value);
-    const prioridad = parseInt(document.getElementById("prioridad").value);
+    if(!unProcesoAgregado){
+      algoritmoActual = algoritmo;
 
-    if (isNaN(duracion) || duracion <= 0) {
-      alert('La duración debe ser un número mayor a 0.');
-      return;
+      if(algoritmo === 'rr'){
+        quantumDiv.style.display = 'block';  // Mostrar quantum
+        prioridadDiv.style.display = 'none'; // Ocultar prioridad
+      }else if(algoritmo === 'mlq' || algoritmo === 'priority'){
+        prioridadDiv.style.display = 'block'; // Mostrar prioridad
+        quantumDiv.style.display = 'none';    // Ocultar quantum
+      }else{
+        prioridadDiv.style.display = 'none'; // Ocultar prioridad
+          quantumDiv.style.display = 'none';    // Ocultar quantum
+      }
+
+    }else{
+      alert("Ya se agrego un proceso con un algoritmo diferente a este");
     }
 
-    const proceso = {
-      id: contadorIdProceso,
-      nombre, color, llegada, duracion, prioridad,
-      tiempoRestante: duracion,
-      haSidoDegradado: false
+    return algoritmoActual;
+}
+
+
+// ===== PROCESOS - 1. Funcion principal de agregar un proceso
+function agregarProceso() {
+
+    // Obtiene lo que escribio el usuario
+    const nombre = document.getElementById('input-id-proceso').value;
+    const llegada = document.getElementById('input-llegada-proceso').value;
+    const color = document.getElementById('color-input').value;
+    const duracion = document.getElementById('input-duracion-proceso').value;
+
+
+    if (!nombre || !llegada || !duracion) {
+        alert("Completa nombre, llegada y duración");
+        return;
+    }
+    
+    // Esto es lo que se va a mandar al python
+    
+    const datos = {
+        nombre: nombre,
+        llegada: llegada, 
+        color: color,
+        duracion: duracion,
+        algoritmo: algoritmoActual  // Aqui es el algoritmo que tiene actual
     };
-    listaProcesos.push(proceso);
-    contadorIdProceso++;
-    dibujarListaProcesos();
-    document.getElementById("input-id-proceso").value = '';
-  }
 
-  function dibujarListaProcesos() {
-    contenedorProcesos.innerHTML = '';
-    listaProcesos.forEach((proceso, indice) => {
-      const elementoProceso = document.createElement('div');
-      elementoProceso.className = 'elemento-proceso';
-
-      const prioridadInfo = selectorAlgoritmo.value === 'priority' ?
-        `<span class="info-detalle">Prioridad: ${proceso.prioridad}</span>` : '';
-
-      elementoProceso.innerHTML = `
-            <div class="info-proceso">
-                <div class="color-dot" style="background-color: ${proceso.color};"></div>
-                <div class="texto-info">
-                    <strong>${proceso.nombre}</strong>
-                    <span class="info-detalle">Llegada: ${proceso.llegada}</span>
-                    <span class="info-detalle">Duración: ${proceso.duracion}</span>
-                    ${prioridadInfo}
-                </div>
-            </div>
-            <button class="boton-eliminar-proceso" data-indice="${indice}">Eliminar</button>
-        `;
-      contenedorProcesos.appendChild(elementoProceso);
-    });
-
-    contenedorProcesos.querySelectorAll('.boton-eliminar-proceso').forEach(boton => {
-      boton.addEventListener('click', (e) => {
-        listaProcesos.splice(e.target.dataset.indice, 1);
-        dibujarListaProcesos();
-      });
-    });
-  }
-
-  function iniciarSimulacion() {
-    if (listaProcesos.length === 0 || simulacionCorriendo) return;
-    simulacionCorriendo = true;
-    reiniciarEstadoSimulacion();
-    intervaloSimulacion = setInterval(pasoDeSimulacion, 700);
-  }
-
-  function pausarSimulacion() {
-    simulacionCorriendo = false;
-    clearInterval(intervaloSimulacion);
-  }
-
-  function reiniciarSimulacion() {
-    pausarSimulacion();
-    listaProcesos = [];
-    contadorIdProceso = 1;
-    reiniciarEstadoSimulacion();
-    dibujarListaProcesos();
-    cuerpoTablaResultados.innerHTML = '';
-    actualizarEstadisticas(true);
-  }
-
-  function reiniciarEstadoSimulacion() {
-    tiempoActual = 0;
-    procesoEnEjecucion = null;
-    quantumCounter = 0;
-    colaAltaPrioridad = [];
-    colaBajaPrioridad = [];
-    cuerpoGantt.innerHTML = '';
-
-    listaProcesos.forEach(p => {
-      p.tiempoRestante = p.duracion;
-      p.tiempoFinalizacion = undefined;
-      p.tiempoEspera = undefined;
-      p.tiempoRetorno = undefined;
-      p.haSidoDegradado = false;
-    });
-  }
-
-  function pasoDeSimulacion() {
-    // se anaden los procesos nuevos a las colas
-    listaProcesos.forEach(p => {
-      if (p.llegada === tiempoActual) {
-        // para MLQ y otros, todos empiezan en la de alta prioridad
-        colaAltaPrioridad.push(p);
-      }
-    });
-
-    // eleccionamos el próximo proceso
-    seleccionarProximoProceso();
-
-    dibujarEnGantt(procesoEnEjecucion);
-
-    if (procesoEnEjecucion) {
-      procesoEnEjecucion.tiempoRestante--;
-      quantumCounter++;
-
-      if (procesoEnEjecucion.tiempoRestante === 0) {
-        finalizarProceso(procesoEnEjecucion);
-        procesoEnEjecucion = null;
-      }
+    // Si el algoritmo es priority o mlq, agregar prioridad
+    if(algoritmoActual === 'priority' || algoritmoActual === 'mlq'){
+        const prioridad = document.getElementById('prioridad').value;
+        if(!prioridad){
+            alert("Este algoritmo requiere prioridad");
+            return;
+        }
+        datos.prioridad = prioridad;  
     }
 
-    dibujarTablaResultados();
-    actualizarEstadisticas();
-    tiempoActual++;
-
-    if (listaProcesos.every(p => p.tiempoRestante === 0)) {
-      pausarSimulacion();
+    // Si el algoritmo es rr, agregar quantum
+    if(algoritmoActual === 'rr'){
+        const quantum = document.getElementById('quantum').value;
+        if(!quantum){
+            alert("Round Robin requiere quantum");
+            return;
+        }
+        datos.quantum = quantum; 
     }
-  }
 
-  function seleccionarProximoProceso() {
-    const algoritmo = selectorAlgoritmo.value;
-    const quantum = parseInt(document.getElementById('quantum').value);
-    let debeCambiar = false;
+    // Envia a Python
+    fetch('/agregar', {
+        method: 'POST',  //Le dice que va a agregar algo
+        headers: {
+            'Content-Type': 'application/json'  
+        },    
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())  // Cuando Python responda
+    .then(resultado => {
+        if(resultado.error){
+          alert(`Error: ${resultado.error}`)
+        }else{
+          unProcesoAgregado = true;
+          cargarProcesos();
 
-    const esDeColaAlta = algoritmo === 'rr' || (algoritmo === 'mlq' && procesoEnEjecucion && !procesoEnEjecucion.haSidoDegradado);
+          // Limpiar el formulario
+          document.getElementById('input-id-proceso').value = '';
+          document.getElementById('input-llegada-proceso').value = '';
+          document.getElementById('input-duracion-proceso').value = '';
+          document.getElementById('prioridad').value = '';
+          document.getElementById('quantum').value = ''; 
 
-    if (esDeColaAlta && quantumCounter >= quantum) {
-      if (procesoEnEjecucion.tiempoRestante > 0) {
-        if (algoritmo === 'mlq') {
-          procesoEnEjecucion.haSidoDegradado = true;
-          colaBajaPrioridad.push(procesoEnEjecucion);
+          alert(` ${resultado.mensaje}`);
+        }
+    });
+
+
+}
+
+// ==== PROCESOS - 2. Cargar los procesos que estan en python
+async function cargarProcesos() {
+    try {
+        const response = await fetch('/procesos');
+        const procesos = await response.json();
+        
+        const container = document.getElementById('procesos-container');
+
+        container.innerHTML = ''; // Limpiar
+        
+        // Si no hay procesos
+        if (procesos.length === 0) {
+            container.innerHTML += '<p style="text-align: center; color: gray; padding: 20px;">No hay procesos agregados</p>';
+            return;
+        }
+        procesos.forEach(proceso => {
+            const divAuxiliar = mostrarProceso(proceso);
+            console.log("al cargar lo datos, el color es: ", proceso.color);  
+            container.appendChild(divAuxiliar);
+        });
+        
+    } catch (error) {
+        console.error("Error cargando procesos:", error);
+    }
+}
+
+// ==== PROCESOS - 3. Mostrar un proceso, de los procesos cargados
+function mostrarProceso(proceso) {
+    // Crear el contenedor principal del proceso
+    const divProceso = document.createElement('div');
+    divProceso.className = 'proceso-item';
+    divProceso.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        margin: 8px 0;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid ${proceso.color};
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    `;
+
+    // Parte izquierda
+    const infoDiv = document.createElement('div');
+    infoDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-grow: 1;
+    `;
+
+
+    // Informacion del proceso
+    const textoInfo = document.createElement('div');
+    textoInfo.innerHTML = `
+        <strong style="font-size: 16px; color: #2c3e50;">${proceso.nombre}</strong><br>
+        <small style="color: #7f8c8d;">
+            Llegada: ${proceso.llegada} | 
+            Duracion: ${proceso.duracion}
+            ${proceso.prioridad ? ` | Prioridad: ${proceso.prioridad}` : ''}
+            ${proceso.quantum ? ` | Quantum: ${proceso.quantum}` : ''}
+        </small>
+    `;
+
+    // Boton eliminar
+    const botonEliminar = document.createElement('button');
+    botonEliminar.textContent = 'Eliminar';
+    botonEliminar.style.cssText = `
+        width: 120px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    `;
+
+    botonEliminar.onmouseover = function() {
+        this.style.backgroundColor = '#c0392b';
+    };
+    botonEliminar.onmouseout = function() {
+        this.style.backgroundColor = '#e74c3c';
+    };
+
+    // Evento para eliminar el proceso
+    botonEliminar.addEventListener('click', function() {
+        if (confirm(`¿Estas seguro de eliminar el proceso ${proceso.nombre}?`)) {
+            eliminarProceso(proceso.nombre);
+        }
+    });
+
+    // Ensamblar todo
+    infoDiv.appendChild(textoInfo);
+    
+    divProceso.appendChild(infoDiv);
+    divProceso.appendChild(botonEliminar);
+
+    return divProceso;
+}
+
+// El mismo nombre lo dice xd
+async function eliminarProceso(nombre) {
+  
+    try {
+        const response = await fetch(`/eliminar/${nombre}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            // Recargar la lista
+            cargarProcesos();     
         } else {
-          colaAltaPrioridad.push(procesoEnEjecucion);
+            alert("Error al eliminar proceso");
+            
         }
-      }
-      procesoEnEjecucion = null;
-      debeCambiar = true;
+    } catch (error) {
+        console.error("Error:", error);
     }
-
-    // para algoritmos apropiativos (srtf y prioridad)
-    if (algoritmo === 'srtf' || algoritmo === 'priority') {
-      let colaUnificada = [...colaAltaPrioridad, ...colaBajaPrioridad];
-      if (colaUnificada.length > 0) {
-        colaUnificada.sort((a, b) => algoritmo === 'srtf' ? a.tiempoRestante - b.tiempoRestante : a.prioridad - b.prioridad);
-        if (procesoEnEjecucion !== colaUnificada[0]) {
-          procesoEnEjecucion = colaUnificada[0];
-          quantumCounter = 0;
-        }
-      }
-      return;
-    }
-
-    // para seleccionar nuevo proceso si la CPU esta libre
-    if (procesoEnEjecucion === null) {
-      if (algoritmo === 'mlq') {
-        if (colaAltaPrioridad.length > 0) {
-          procesoEnEjecucion = colaAltaPrioridad.shift();
-        } else if (colaBajaPrioridad.length > 0) {
-          procesoEnEjecucion = colaBajaPrioridad.shift();
-        }
-      } else { // para fcfs, sjf, rr
-        let colaListos = colaAltaPrioridad;
-        if (colaListos.length > 0) {
-          if (algoritmo === 'sjf') {
-            colaListos.sort((a, b) => a.duracion - b.duracion);
-          }
-          procesoEnEjecucion = colaListos.shift();
-        }
-      }
-      quantumCounter = 0;
-    }
-  }
-
-  function finalizarProceso(proceso) {
-    proceso.tiempoFinalizacion = tiempoActual + 1;
-    proceso.tiempoRetorno = proceso.tiempoFinalizacion - proceso.llegada;
-    proceso.tiempoEspera = proceso.tiempoRetorno - proceso.duracion;
-
-    let indiceEnColaAlta = colaAltaPrioridad.findIndex(p => p.id === proceso.id);
-    if (indiceEnColaAlta > -1) colaAltaPrioridad.splice(indiceEnColaAlta, 1);
-
-    let indiceEnColaBaja = colaBajaPrioridad.findIndex(p => p.id === proceso.id);
-    if (indiceEnColaBaja > -1) colaBajaPrioridad.splice(indiceEnColaBaja, 1);
-  }
-
-  function dibujarEnGantt(proceso) {
-    const bloque = document.createElement('div');
-    bloque.className = 'bloque-gantt';
-    if (proceso) {
-      bloque.style.backgroundColor = proceso.color;
-      bloque.innerText = proceso.nombre;
-    } else {
-      bloque.style.backgroundColor = '#E0E0E0';
-    }
-    cuerpoGantt.appendChild(bloque);
-    cuerpoGantt.parentElement.scrollLeft = cuerpoGantt.parentElement.scrollWidth;
-  }
-
-  function dibujarTablaResultados() {
-    cuerpoTablaResultados.innerHTML = '';
-    listaProcesos.forEach(p => {
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
-                <td style="color: ${p.color}; font-weight: bold;">${p.nombre}</td>
-                <td>${p.llegada}</td>
-                <td>${p.duracion}</td>
-                <td>${selectorAlgoritmo.value === 'priority' ? p.prioridad : '-'}</td>
-                <td>${p.tiempoFinalizacion || '-'}</td>
-                <td>${p.tiempoEspera !== undefined && p.tiempoFinalizacion ? p.tiempoEspera : '-'}</td>
-                <td>${p.tiempoRetorno || '-'}</td>
-            `;
-      cuerpoTablaResultados.appendChild(fila);
-    });
-  }
-
-  function actualizarEstadisticas(resetear = false) {
-    const completados = listaProcesos.filter(p => p.tiempoFinalizacion);
-    if (resetear || completados.length === 0) {
-      elEsperaPromedio.innerText = '0.00';
-      elRetornoPromedio.innerText = '0.00';
-      return;
-    }
-    const totalEspera = completados.reduce((sum, p) => sum + p.tiempoEspera, 0);
-    const totalRetorno = completados.reduce((sum, p) => sum + p.tiempoRetorno, 0);
-    elEsperaPromedio.innerText = (totalEspera / completados.length).toFixed(2);
-    elRetornoPromedio.innerText = (totalRetorno / completados.length).toFixed(2);
-  }
-
-  gestionarCamposAlgoritmo();
-});
+}

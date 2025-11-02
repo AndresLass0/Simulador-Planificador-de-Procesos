@@ -58,7 +58,7 @@
                     <input type="number" id="quantum" min="1" value="2">
                 </div>
                 
-                <button id="boton-agregar-proceso">Agregar Proceso</button>
+                <button id="boton-agregar-proceso" onclick="agregarProceso()">Agregar Proceso</button>
             </div>
 
             <div class="lista-procesos">
@@ -77,9 +77,9 @@
 
         <div id = "tabla-derecha">
             <h2>Simulación</h2> 
-            <div class="diagrama-gantt">
-                <div class="diagrama-encabezado" id="encabezado-gantt"></div>
-                <div class="diagrama-cuerpo" id="cuerpo-gantt"></div>
+            <div class="contenedor-grafica">
+                <div class="grafica-encabezado" id="grafica-encabezado"></div>
+                <div class="grafica-cuerpo" id="grafica-cuerpo"></div>
             </div>
             
             <h2>Tabla de Resultados Finales</h2>
