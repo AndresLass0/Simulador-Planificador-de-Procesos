@@ -1,6 +1,5 @@
-
-let unProcesoAgregado = false;
 let algoritmoActual;
+let procesos = 0;
 
 document.addEventListener("DOMContentLoaded", inicializarEventos);
 
@@ -22,7 +21,7 @@ function obtenerAlgoritmoActual() {
     const prioridadDiv = document.getElementById('agregar-prioridad');
     const quantumDiv = document.getElementById('agregar-quantum');
 
-    if(!unProcesoAgregado){
+    if(procesos === 0){
       algoritmoActual = algoritmo;
 
       if(algoritmo === 'rr'){
@@ -102,7 +101,8 @@ function agregarProceso() {
         if(resultado.error){
           alert(`Error: ${resultado.error}`)
         }else{
-          unProcesoAgregado = true;
+          procesos++;
+
           cargarProcesos();
 
           // Limpiar el formulario
@@ -159,7 +159,6 @@ function mostrarProceso(proceso) {
         background-color: #f8f9fa;
         border-radius: 8px;
         border-left: 4px solid ${proceso.color};
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     `;
 
     // Parte izquierda
@@ -232,6 +231,7 @@ async function eliminarProceso(nombre) {
         
         if (response.ok) {
             // Recargar la lista
+            procesos--;
             cargarProcesos();     
         } else {
             alert("Error al eliminar proceso");
@@ -248,172 +248,113 @@ async function eliminarProceso(nombre) {
 //==========================================
 
 
-// Variables para simulacion en tiempo real
-let simulacionEnCurso = false;
-let intervaloSimulacion;
+async function iniciarSimulacionPasoAPaso(){
+    const response = await fetch("/simular");
+    const timeline = await response.json();
 
-// ===== INICIAR SIMULACION PASO A PASO =====
-async function iniciarSimulacionPasoAPaso() {
-  
-    try {
-        const algoritmo = algoritmoActual;
-        const response = await fetch('/iniciar_simulacion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                algoritmo: algoritmo
-            })
-        });
-        
-        const resultado = await response.json();
-        
-        if (resultado.error) {
-            alert(`Error: ${resultado.error}`);
-            return;
-        }
-        
-        // Iniciar la simulacion paso a paso
-        simulacionEnCurso = true;
-        intervaloSimulacion = setInterval(ejecutarPasoSimulacion, 1000); // 1 segundo por paso
-        
-    } catch (error) {
-        console.error("Error iniciando simulación:", error);
-        alert("Error de conexión");
+    console.log("Timeline:", timeline);
+
+    if(timeline.error){
+        alert("Error en simulación: " + timeline.error);
+        return;
+    }
+
+    const duracionTotal = timeline[timeline.length - 1].der + 1; // tam maximo
+
+    crearLineaDeTiempo(duracionTotal);
+
+    // Llenar tabla y estadisticas
+    const responseProcesos = await fetch('/procesos');
+    const procesosOriginales = await responseProcesos.json();
+    llenarTablaYEstadisticas(timeline, procesosOriginales);
+
+    await pintarProcesos(timeline); // Pintar los procesos
+}
+
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function crearLineaDeTiempo(duracionTotal){
+    const graficaCuerpo = document.getElementById("grafica-cuerpo");
+    graficaCuerpo.innerHTML = "";
+
+    const graficaEncabezado = document.getElementById("grafica-encabezado");
+    graficaEncabezado.innerHTML = "";
+ 
+
+    for(let t = 0; t <= duracionTotal; t++){
+        const bloqueCuerpo = document.createElement("div");
+        bloqueCuerpo.classList.add("gantt-block", "empty"); // Dos clases, una de diseño, otra si esta vacia
+        bloqueCuerpo.dataset.time = t; // Un atributo personalizado (una posicion)
+
+        const bloqueEncabezado = document.createElement("div");
+        bloqueEncabezado.classList.add("bloque-linea-tiempo")
+        bloqueEncabezado.textContent = t; // Para mostrar los numeros
+
+        graficaCuerpo.appendChild(bloqueCuerpo);
+        graficaEncabezado.appendChild(bloqueEncabezado);
     }
 }
 
-// ===== EJECUTAR UN PASO DE SIMULACION =====
-async function ejecutarPasoSimulacion() {
-    try {
-        const response = await fetch('/paso-simulacion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+async function pintarProcesos(timeline){
+    for(let p of timeline){
+        for(let t = p.izq; t <= p.der; t++){
+            const bloque = document.querySelector(`[data-time='${t}']`);
+            if(bloque){
+                bloque.classList.remove("empty");  //quitar vacio
+                bloque.style.backgroundColor = p.color; //color proceso
+                bloque.textContent = p.nombre; //nombre proceso
             }
-        });
-        
-        const resultado = await response.json();
-        
-        if (resultado.error) {
-            console.error("Error en paso:", resultado.error);
-            detenerSimulacion();
-            return;
+            
+            await sleep(1000); // esperar 1 seg, antes de pintar el otro proceso
         }
-        
-        // Actualizar la interfaz con el nuevo estado
-        actualizarInterfazSimulacion(resultado);
-        
-        // Verificar si terminó la simulacion
-        if (resultado.terminado) {
-            detenerSimulacion();
-            alert("Simulacion completada");
-        }
-        
-    } catch (error) {
-        console.error("Error en paso de simulación:", error);
-        detenerSimulacion();
     }
 }
 
-// ===== ACTUALIZAR INTERFAZ CON ESTADO ACTUAL =====
-function actualizarInterfazSimulacion(estadoSimulacion) {
-    const estado = estadoSimulacion.estado;
-    
-    // Actualizar diagrama de Gantt
-    actualizarGanttTiempoReal(estado.gantt_data);
-    
-    // Actualizar tabla de procesos
-    actualizarTablaProcesosTiempoReal(estado);
-    
-    // Actualizar estadisticas
-    actualizarEstadisticasTiempoReal(estado);
-    
-    // Mostrar proceso actual
-    mostrarProcesoActual(estadoSimulacion.proceso_actual);
-}
 
-// ===== ACTUALIZAR GANTT EN TIEMPO REAL =====
-function actualizarGanttTiempoReal(ganttData) {
-    const graficaCuerpo = document.getElementById('grafica-cuerpo');
-    const graficaEncabezado = document.getElementById('grafica-encabezado');
-    
-    // Limpiar
-    graficaCuerpo.innerHTML = '';
-    graficaEncabezado.innerHTML = '';
-    
-    // Calcular tiempo maximo
-    const tiempoMaximo = Math.max(...ganttData.map(g => g.fin), 0);
-    
-    // Generar encabezado de tiempos
-    for (let i = 0; i <= tiempoMaximo; i++) {
-        const tiempoElem = document.createElement('div');
-        tiempoElem.className = 'gantt-time';
-        tiempoElem.textContent = i;
-        graficaEncabezado.appendChild(tiempoElem);
-    }
-    
-    // Generar bloques del Gantt
-    ganttData.forEach(bloque => {
-        const bloqueElem = document.createElement('div');
-        bloqueElem.className = `gantt-block ${bloque.proceso ? '' : 'empty'}`;
-        
-        const duracion = bloque.fin - bloque.inicio;
-        bloqueElem.style.width = `${duracion * 40}px`;
-        bloqueElem.style.backgroundColor = bloque.color || 'transparent';
-        bloqueElem.textContent = bloque.proceso || '';
-        bloqueElem.title = bloque.proceso ? 
-            `${bloque.proceso}: ${bloque.inicio}-${bloque.fin}` : 'Tiempo inactivo';
-        
-        graficaCuerpo.appendChild(bloqueElem);
-    });
-}
 
-// ===== ACTUALIZAR TABLA EN TIEMPO REAL =====
-function actualizarTablaProcesosTiempoReal(estado) {
-    const tablaCuerpo = document.getElementById('cuerpo-tabla-resultados');
-    tablaCuerpo.innerHTML = '';
+// =========== TABLA & ESTADISTICAS =======
+
+function llenarTablaYEstadisticas(timeline, procesosOriginales){
+    const cuerpoTabla = document.getElementById("cuerpo-tabla-resultados");
+    cuerpoTabla.innerHTML = ""; // limpiar tabla
     
-    // Combinar procesos pendientes y completados
-    const todosProcesos = [
-        ...estado.procesos_pendientes,
-        ...estado.procesos_completados
-    ];
-    
-    todosProcesos.forEach(proceso => {
-        const fila = document.createElement('tr');
-        
-        const tiempoRetorno = proceso.tiempo_final ? 
-            proceso.tiempo_final - proceso.llegada : '-';
-        
+    let totalEspera = 0;
+    let totalRetorno = 0;
+
+    timeline.forEach(p => {
+        // buscar los datos originales (llegada, duracion, prioridad)
+        const procesoOriginal = procesosOriginales.find(pr => pr.nombre === p.nombre);
+        if(!procesoOriginal) return;
+
+        const llegada = procesoOriginal.llegada;
+        const duracion = procesoOriginal.duracion;
+        const prioridad = procesoOriginal.prioridad || "-";
+
+        const finalizacion = p.der + 1;  // último instante ocupado +1
+        const retorno = finalizacion - llegada;
+        const espera = retorno - duracion;
+
+        totalEspera += espera;
+        totalRetorno += retorno;
+
+        // crear fila de tabla
+        const fila = document.createElement("tr");
         fila.innerHTML = `
-            <td style="font-weight: bold; color: ${proceso.color}">${proceso.nombre}</td>
-            <td>${proceso.llegada}</td>
-            <td>${proceso.duracion}</td>
-            <td>${proceso.prioridad || '-'}</td>
-            <td>${proceso.tiempo_final || 'En ejecución'}</td>
-            <td>${proceso.tiempo_espera || '-'}</td>
-            <td>${tiempoRetorno}</td>
+            <td>${p.nombre}</td>
+            <td>${llegada}</td>
+            <td>${duracion}</td>
+            <td>${prioridad}</td>
+            <td>${finalizacion}</td>
+            <td>${espera}</td>
+            <td>${retorno}</td>
         `;
-        
-        tablaCuerpo.appendChild(fila);
+        cuerpoTabla.appendChild(fila);
     });
-}
 
-// ===== DETENER SIMULACION =====
-function detenerSimulacion() {
-    if (intervaloSimulacion) {
-        clearInterval(intervaloSimulacion);
-        intervaloSimulacion = null;
-    }
-    simulacionEnCurso = false;
-    
-    // Llamar al backend para detener
-    fetch('/detener-simulacion', { method: 'POST' });
+    // estadisticas
+    const n = timeline.length;
+    document.getElementById("espera-promedio").textContent = (totalEspera / n).toFixed(2);
+    document.getElementById("retorno-promedio").textContent = (totalRetorno / n).toFixed(2);
 }
-
-// ===== MODIFICAR BOTONES =====
-// Cambia el botón "Iniciar Simulación" para usar la versión paso a paso
-document.getElementById('boton-iniciar').addEventListener('click', iniciarSimulacionPasoAPaso);
-document.getElementById('boton-pausar').addEventListener('click', detenerSimulacion);
