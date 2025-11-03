@@ -55,7 +55,7 @@ function agregarProceso() {
 
 
     if (!nombre || !llegada || !duracion) {
-        alert("Completa nombre, llegada y duración");
+        alert("Completa nombre, llegada y duracion");
         return;
     }
     
@@ -241,3 +241,179 @@ async function eliminarProceso(nombre) {
         console.error("Error:", error);
     }
 }
+
+
+//==========================================
+//======== SIMULACION & GRAFICA =============
+//==========================================
+
+
+// Variables para simulacion en tiempo real
+let simulacionEnCurso = false;
+let intervaloSimulacion;
+
+// ===== INICIAR SIMULACION PASO A PASO =====
+async function iniciarSimulacionPasoAPaso() {
+  
+    try {
+        const algoritmo = algoritmoActual;
+        const response = await fetch('/iniciar_simulacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                algoritmo: algoritmo
+            })
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.error) {
+            alert(`Error: ${resultado.error}`);
+            return;
+        }
+        
+        // Iniciar la simulacion paso a paso
+        simulacionEnCurso = true;
+        intervaloSimulacion = setInterval(ejecutarPasoSimulacion, 1000); // 1 segundo por paso
+        
+    } catch (error) {
+        console.error("Error iniciando simulación:", error);
+        alert("Error de conexión");
+    }
+}
+
+// ===== EJECUTAR UN PASO DE SIMULACION =====
+async function ejecutarPasoSimulacion() {
+    try {
+        const response = await fetch('/paso-simulacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.error) {
+            console.error("Error en paso:", resultado.error);
+            detenerSimulacion();
+            return;
+        }
+        
+        // Actualizar la interfaz con el nuevo estado
+        actualizarInterfazSimulacion(resultado);
+        
+        // Verificar si terminó la simulacion
+        if (resultado.terminado) {
+            detenerSimulacion();
+            alert("Simulacion completada");
+        }
+        
+    } catch (error) {
+        console.error("Error en paso de simulación:", error);
+        detenerSimulacion();
+    }
+}
+
+// ===== ACTUALIZAR INTERFAZ CON ESTADO ACTUAL =====
+function actualizarInterfazSimulacion(estadoSimulacion) {
+    const estado = estadoSimulacion.estado;
+    
+    // Actualizar diagrama de Gantt
+    actualizarGanttTiempoReal(estado.gantt_data);
+    
+    // Actualizar tabla de procesos
+    actualizarTablaProcesosTiempoReal(estado);
+    
+    // Actualizar estadisticas
+    actualizarEstadisticasTiempoReal(estado);
+    
+    // Mostrar proceso actual
+    mostrarProcesoActual(estadoSimulacion.proceso_actual);
+}
+
+// ===== ACTUALIZAR GANTT EN TIEMPO REAL =====
+function actualizarGanttTiempoReal(ganttData) {
+    const graficaCuerpo = document.getElementById('grafica-cuerpo');
+    const graficaEncabezado = document.getElementById('grafica-encabezado');
+    
+    // Limpiar
+    graficaCuerpo.innerHTML = '';
+    graficaEncabezado.innerHTML = '';
+    
+    // Calcular tiempo maximo
+    const tiempoMaximo = Math.max(...ganttData.map(g => g.fin), 0);
+    
+    // Generar encabezado de tiempos
+    for (let i = 0; i <= tiempoMaximo; i++) {
+        const tiempoElem = document.createElement('div');
+        tiempoElem.className = 'gantt-time';
+        tiempoElem.textContent = i;
+        graficaEncabezado.appendChild(tiempoElem);
+    }
+    
+    // Generar bloques del Gantt
+    ganttData.forEach(bloque => {
+        const bloqueElem = document.createElement('div');
+        bloqueElem.className = `gantt-block ${bloque.proceso ? '' : 'empty'}`;
+        
+        const duracion = bloque.fin - bloque.inicio;
+        bloqueElem.style.width = `${duracion * 40}px`;
+        bloqueElem.style.backgroundColor = bloque.color || 'transparent';
+        bloqueElem.textContent = bloque.proceso || '';
+        bloqueElem.title = bloque.proceso ? 
+            `${bloque.proceso}: ${bloque.inicio}-${bloque.fin}` : 'Tiempo inactivo';
+        
+        graficaCuerpo.appendChild(bloqueElem);
+    });
+}
+
+// ===== ACTUALIZAR TABLA EN TIEMPO REAL =====
+function actualizarTablaProcesosTiempoReal(estado) {
+    const tablaCuerpo = document.getElementById('cuerpo-tabla-resultados');
+    tablaCuerpo.innerHTML = '';
+    
+    // Combinar procesos pendientes y completados
+    const todosProcesos = [
+        ...estado.procesos_pendientes,
+        ...estado.procesos_completados
+    ];
+    
+    todosProcesos.forEach(proceso => {
+        const fila = document.createElement('tr');
+        
+        const tiempoRetorno = proceso.tiempo_final ? 
+            proceso.tiempo_final - proceso.llegada : '-';
+        
+        fila.innerHTML = `
+            <td style="font-weight: bold; color: ${proceso.color}">${proceso.nombre}</td>
+            <td>${proceso.llegada}</td>
+            <td>${proceso.duracion}</td>
+            <td>${proceso.prioridad || '-'}</td>
+            <td>${proceso.tiempo_final || 'En ejecución'}</td>
+            <td>${proceso.tiempo_espera || '-'}</td>
+            <td>${tiempoRetorno}</td>
+        `;
+        
+        tablaCuerpo.appendChild(fila);
+    });
+}
+
+// ===== DETENER SIMULACION =====
+function detenerSimulacion() {
+    if (intervaloSimulacion) {
+        clearInterval(intervaloSimulacion);
+        intervaloSimulacion = null;
+    }
+    simulacionEnCurso = false;
+    
+    // Llamar al backend para detener
+    fetch('/detener-simulacion', { method: 'POST' });
+}
+
+// ===== MODIFICAR BOTONES =====
+// Cambia el botón "Iniciar Simulación" para usar la versión paso a paso
+document.getElementById('boton-iniciar').addEventListener('click', iniciarSimulacionPasoAPaso);
+document.getElementById('boton-pausar').addEventListener('click', detenerSimulacion);

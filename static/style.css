@@ -209,3 +209,43 @@ button:hover {
   color: #555;
   margin-top: 5px;
 }
+
+
+.gantt-time {
+    min-width: 40px;
+    text-align: center;
+    padding: 5px;
+    border-right: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.gantt-block {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-radius: 3px;
+    margin-right: 2px;
+}
+
+.gantt-block.empty {
+    background-color: #f0f0f0;
+    color: transparent;
+}
+
+.gantt-header, .gantt-body {
+    display: flex;
+    align-items: center;
+}
+
+.gantt-header {
+    border-bottom: 2px solid #34495e;
+    margin-bottom: 10px;
+}
+
+.gantt-body {
+    height: 50px;
+}
