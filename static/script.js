@@ -32,7 +32,7 @@ function obtenerAlgoritmoActual() {
         quantumDiv.style.display = 'none';    // Ocultar quantum
       }else{
         prioridadDiv.style.display = 'none'; // Ocultar prioridad
-          quantumDiv.style.display = 'none';    // Ocultar quantum
+        quantumDiv.style.display = 'none';    // Ocultar quantum
       }
 
     }else{
@@ -44,7 +44,7 @@ function obtenerAlgoritmoActual() {
 
 
 // ===== PROCESOS - 1. Funcion principal de agregar un proceso
-function agregarProceso() {
+function agregarProceso(){
 
     // Obtiene lo que escribio el usuario
     const nombre = document.getElementById('input-id-proceso').value;
@@ -53,7 +53,7 @@ function agregarProceso() {
     const duracion = document.getElementById('input-duracion-proceso').value;
 
 
-    if (!nombre || !llegada || !duracion) {
+    if(!nombre || !llegada || !duracion){
         alert("Completa nombre, llegada y duracion");
         return;
     }
@@ -98,6 +98,7 @@ function agregarProceso() {
     })
     .then(response => response.json())  // Cuando Python responda
     .then(resultado => {
+
         if(resultado.error){
           alert(`Error: ${resultado.error}`)
         }else{
@@ -123,7 +124,7 @@ function agregarProceso() {
 async function cargarProcesos() {
     try {
         const response = await fetch('/procesos');
-        const procesos = await response.json();
+        const procesos = await response.json(); // Los datos del python
         
         const container = document.getElementById('procesos-container');
 
@@ -134,6 +135,8 @@ async function cargarProcesos() {
             container.innerHTML += '<p style="text-align: center; color: gray; padding: 20px;">No hay procesos agregados</p>';
             return;
         }
+
+
         procesos.forEach(proceso => {
             const divAuxiliar = mostrarProceso(proceso);
             console.log("al cargar lo datos, el color es: ", proceso.color);  
@@ -258,7 +261,7 @@ async function iniciarSimulacionPasoAPaso(){
         alert("Error en simulación: " + timeline.error);
         return;
     }
-
+   
     const duracionTotal = timeline[timeline.length - 1].der + 1; // tam maximo
 
     crearLineaDeTiempo(duracionTotal);
@@ -286,7 +289,7 @@ function crearLineaDeTiempo(duracionTotal){
     for(let t = 0; t <= duracionTotal; t++){
         const bloqueCuerpo = document.createElement("div");
         bloqueCuerpo.classList.add("gantt-block", "empty"); // Dos clases, una de diseño, otra si esta vacia
-        bloqueCuerpo.dataset.time = t; // Un atributo personalizado (una posicion)
+        bloqueCuerpo.dataset.time = t; // Un atributo personalizado (la posicion)
 
         const bloqueEncabezado = document.createElement("div");
         bloqueEncabezado.classList.add("bloque-linea-tiempo")
@@ -307,7 +310,7 @@ async function pintarProcesos(timeline){
                 bloque.textContent = p.nombre; //nombre proceso
             }
             
-            await sleep(1000); // esperar 1 seg, antes de pintar el otro proceso
+            await sleep(1000); // esperar 1 seg, antes de pintar el otro proceso    
         }
     }
 }
@@ -332,7 +335,7 @@ function llenarTablaYEstadisticas(timeline, procesosOriginales){
         const duracion = procesoOriginal.duracion;
         const prioridad = procesoOriginal.prioridad || "-";
 
-        const finalizacion = p.der + 1;  // último instante ocupado +1
+        const finalizacion = p.der + 1;  // ultimo instante ocupado +1
         const retorno = finalizacion - llegada;
         const espera = retorno - duracion;
 
